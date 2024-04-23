@@ -1,44 +1,45 @@
 # Importing essential libraries
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pickle
 import numpy as np
+from flask_cors import CORS
 
-# Load the Random Forest CLassifier model
+# Load the Random Forest Classifier model
 filename = 'heart-disease-prediction-knn-model.pkl'
 model = pickle.load(open(filename, 'rb'))
 
 app = Flask(__name__)
+CORS(app, resources={r"/predict": {"origins": "http://localhost:5173"}})
 
 @app.route('/')
 def home():
-	return render_template('main.html')
+    return render_template('main.html')
 
 
-@app.route('/predict', methods=['GET','POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
     if request.method == 'POST':
+        data = request.json
+        age = int(data['age'])
+        sex = data['sex']
+        cp = data['cp']
+        trestbps = int(data['trestbps'])
+        chol = int(data['chol'])
+        fbs = data['fbs']
+        restecg = int(data['restecg'])
+        thalach = int(data['thalach'])
+        exang = data['exang']
+        oldpeak = float(data['oldpeak'])
+        slope = data['slope']
+        ca = int(data['ca'])
+        thal = data['thal']
 
-        age = int(request.form['age'])
-        sex = request.form.get('sex')
-        cp = request.form.get('cp')
-        trestbps = int(request.form['trestbps'])
-        chol = int(request.form['chol'])
-        fbs = request.form.get('fbs')
-        restecg = int(request.form['restecg'])
-        thalach = int(request.form['thalach'])
-        exang = request.form.get('exang')
-        oldpeak = float(request.form['oldpeak'])
-        slope = request.form.get('slope')
-        ca = int(request.form['ca'])
-        thal = request.form.get('thal')
-        
-        data = np.array([[age,sex,cp,trestbps,chol,fbs,restecg,thalach,exang,oldpeak,slope,ca,thal]])
-        my_prediction = model.predict(data)
-        
-        return render_template('result.html', prediction=my_prediction)
-        
-        
+        input_data = np.array([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
+        print(input_data)
+        my_prediction = model.predict(input_data)
+        print(my_prediction)
+        return jsonify({'prediction': int(my_prediction[0])})
+
 
 if __name__ == '__main__':
-	app.run(debug=True)
-
+    app.run(debug=True)

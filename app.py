@@ -5,7 +5,7 @@ import numpy as np
 from flask_cors import CORS
 
 # Load the Random Forest Classifier model
-filename = 'heart-disease-prediction-knn-model.pkl'
+filename = 'heart-disease.pkl'
 model = pickle.load(open(filename, 'rb'))
 
 app = Flask(__name__)
